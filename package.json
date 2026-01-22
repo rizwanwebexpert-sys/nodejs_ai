@@ -4,8 +4,8 @@
   "description": "AI image processing API",
   "main": "index.js",
   "scripts": {
-    "dev": "node-dev ./api/index.js",
-    "start": "node-dev ./api/index.js",
+    "dev": "node-dev index.js",
+    "start": "node index.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },

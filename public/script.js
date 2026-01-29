@@ -1,3 +1,5 @@
+const API_URL = "https://nodejs-ai-3591.vercel.app/"; // Change this to your backend URL
+
 // State
 let state = {
   imageFile: null,
@@ -76,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // Check server health
 async function checkHealthStatus() {
   try {
-    const response = await fetch(`/health`);
+    const response = await fetch(`${API_URL}/health`);
     const data = await response.json();
 
     if (data.status === "ok") {
@@ -100,7 +102,7 @@ async function checkHealthStatus() {
                         <i class="fas fa-exclamation-triangle text-red-500 text-lg mr-3"></i>
                         <div>
                             <h3 class="font-medium text-red-800">Server Connection Failed</h3>
-                            <p class="text-sm text-red-600">Please ensure the backend server is running</p>
+                            <p class="text-sm text-red-600">Please ensure the backend server is running on ${API_URL}</p>
                         </div>
                     </div>
                 `;
@@ -353,7 +355,7 @@ async function generateImage() {
   });
 
   try {
-    const response = await fetch(`/create-image`, {
+    const response = await fetch(`${API_URL}/create-image`, {
       method: "POST",
       body: formData,
     });

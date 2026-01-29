@@ -8,6 +8,7 @@ let state = {
     teeth_count: "6",
     brighten: null,
     correct_crowding_with_alignment: null,
+    tooth_shape: "maintain",
     widen_upper_teeth: false,
     widen_lower_teeth: false,
     close_spaces_evenly: false,
@@ -17,6 +18,7 @@ let state = {
     improve_gum_recession: false,
     correct_underbite: false,
     correct_overbite: false,
+    add_characterisation: false,
   },
   results: null,
 };
@@ -146,13 +148,14 @@ function setupEventListeners() {
       const option = button.dataset.option;
       const value = button.dataset.value;
 
-      // Handle boolean-like options (arch, teeth_count, brighten, crowding)
+      // Handle boolean-like options (arch, teeth_count, brighten, crowding, tooth shape)
       if (
         [
           "arch",
           "teeth_count",
           "brighten",
           "correct_crowding_with_alignment",
+          "tooth_shape",
         ].includes(option)
       ) {
         // Deselect all siblings
@@ -276,6 +279,11 @@ function updateOptionsSummary() {
       `<span class="text-blue-600">Brighten:</span> ${options.brighten}`
     );
   }
+  if (options.tooth_shape) {
+    summary.push(
+      `<span class="text-blue-600">Shape:</span> ${options.tooth_shape}`
+    );
+  }
   if (options.correct_crowding_with_alignment) {
     summary.push(
       `<span class="text-blue-600">Crowding:</span> ${options.correct_crowding_with_alignment}`
@@ -293,6 +301,7 @@ function updateOptionsSummary() {
     "improve_gum_recession",
     "correct_underbite",
     "correct_overbite",
+    "add_characterisation",
   ];
 
   booleanOptions.forEach((opt) => {
@@ -448,6 +457,7 @@ function resetAll() {
       teeth_count: "6",
       brighten: null,
       correct_crowding_with_alignment: null,
+      tooth_shape: "maintain",
       widen_upper_teeth: false,
       widen_lower_teeth: false,
       close_spaces_evenly: false,
@@ -457,6 +467,7 @@ function resetAll() {
       improve_gum_recession: false,
       correct_underbite: false,
       correct_overbite: false,
+      add_characterisation: false,
     },
     results: null,
   };
@@ -484,6 +495,9 @@ function resetAll() {
     .classList.add("selected");
   document
     .querySelector('[data-option="teeth_count"][data-value="6"]')
+    .classList.add("selected");
+  document
+    .querySelector('[data-option="tooth_shape"][data-value="maintain"]')
     .classList.add("selected");
 
   updateOptionsSummary();

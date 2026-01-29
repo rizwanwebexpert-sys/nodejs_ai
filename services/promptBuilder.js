@@ -19,6 +19,8 @@ class PromptBuilder {
     this.addMissingTeethModification();
     this.addGummySmileModification();
     this.addIncisorShapeModification();
+    this.addToothShapeModification();
+    this.addCharacterisationModification();
     this.addGumRecessionModification();
     this.addBiteCorrection();
 
@@ -59,12 +61,41 @@ class PromptBuilder {
       subtle:
         "Apply subtle brightening to achieve a natural white shade (1-2 shades lighter)",
       natural: "Brighten to a healthy natural white shade (2-3 shades lighter)",
-      strong:
-        "Apply strong brightening to achieve a bright white shade (3-4 shades lighter)",
+      super_natural:
+        "Preserve the patient's current tooth shade exactly; do NOT alter natural hue or lightness; maintain existing variations",
     };
 
     if (brightenMap[brighten]) {
       this.modifications.push(brightenMap[brighten]);
+    }
+  }
+
+  addCharacterisationModification() {
+    const addChar =
+      this.params.add_characterisation === "true" ||
+      this.params.add_characterisation === true;
+
+    if (addChar) {
+      this.modifications.push(
+        "Add subtle characterization effects: natural specular reflections, enamel opalescence, and controlled chroma variation to enhance realism"
+      );
+    }
+  }
+
+  addToothShapeModification() {
+    const shape = (this.params.tooth_shape || "maintain").toLowerCase();
+    const shapeMap = {
+      maintain: "Maintain baseline tooth form without reshaping",
+      square:
+        "Modify baseline tooth forms toward square contours (more masculine): emphasize flat incisal edges and slightly broader proximal contacts",
+      oval:
+        "Modify baseline tooth forms toward oval contours (more feminine): soften incisal edges and round contours",
+      squoval:
+        "Modify baseline tooth forms to 'squoval' — balanced combination of square and oval features for a natural, modern look",
+    };
+
+    if (shapeMap[shape]) {
+      this.modifications.push(shapeMap[shape]);
     }
   }
 
@@ -249,10 +280,19 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
     }
 
     if (queryParams.brighten) {
-      const validLevels = ["subtle", "natural", "strong"];
+      const validLevels = ["subtle", "natural", "super_natural"];
       if (!validLevels.includes(queryParams.brighten.toLowerCase())) {
         errors.push(
-          "Invalid brighten value. Must be: subtle, natural, or strong"
+          "Invalid brighten value. Must be: subtle, natural, or super_natural"
+        );
+      }
+    }
+
+    if (queryParams.tooth_shape) {
+      const validShapes = ["maintain", "square", "oval", "squoval"];
+      if (!validShapes.includes(queryParams.tooth_shape.toLowerCase())) {
+        errors.push(
+          "Invalid tooth_shape value. Must be: maintain, square, oval, or squoval"
         );
       }
     }
@@ -280,6 +320,7 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
       "improve_gum_recession",
       "correct_underbite",
       "correct_overbite",
+      "add_characterisation",
     ];
 
     booleanParams.forEach((param) => {

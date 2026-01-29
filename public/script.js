@@ -1,4 +1,4 @@
-const API_URL = "https://nodejs-ai-3591.vercel.app/"; // Change this to your backend URL
+const API_URL = "/"; // Change this to your backend URL
 
 // State
 let state = {

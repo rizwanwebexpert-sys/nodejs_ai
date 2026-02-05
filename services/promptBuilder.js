@@ -12,17 +12,23 @@ class PromptBuilder {
     const arch = this.getArch();
     const teethCount = this.getTeethCount();
 
+    // NEW: Determine tooth preservation mode first as it affects other modifications
+    const preservationMode = this.getPreservationMode();
+
     this.addBrighteningModification();
     this.addWidenModification();
     this.addSpacingModification();
     this.addAlignmentModification();
     this.addMissingTeethModification();
     this.addGummySmileModification();
-    this.addIncisorShapeModification();
-    this.addToothShapeModification();
+    this.addIncisorShapeModification(preservationMode); // Pass preservation mode
+    this.addToothShapeModification(preservationMode); // Pass preservation mode
     this.addCharacterisationModification();
     this.addGumRecessionModification();
     this.addBiteCorrection();
+
+    // NEW: Add preservation constraints based on mode
+    this.addPreservationConstraints(preservationMode);
 
     const prompt = this.constructPrompt(arch, teethCount);
     console.log("params", this.params);
@@ -54,6 +60,13 @@ class PromptBuilder {
     return numCount.toString();
   }
 
+  // NEW: Get tooth preservation mode
+  getPreservationMode() {
+    const mode = (this.params.tooth_preservation_mode || "complete").toLowerCase();
+    const validModes = ["complete", "edges_only", "custom"];
+    return validModes.includes(mode) ? mode : "complete";
+  }
+
   addBrighteningModification() {
     const brighten = (this.params.brighten || "").toLowerCase();
 
@@ -82,7 +95,22 @@ class PromptBuilder {
     }
   }
 
-  addToothShapeModification() {
+  // UPDATED: Add tooth shape modification based on preservation mode
+  addToothShapeModification(preservationMode) {
+    // If complete preservation, do not add any tooth shape modifications
+    if (preservationMode === "complete") {
+      return;
+    }
+
+    // If edge contouring only, add specific instruction
+    if (preservationMode === "edges_only") {
+      this.modifications.push(
+        "ONLY perform edge contouring: smooth and refine incisal edges while maintaining the original facial aspects and overall tooth shapes"
+      );
+      return;
+    }
+
+    // Only for custom mode, apply the selected tooth shape
     const shape = (this.params.tooth_shape || "maintain").toLowerCase();
     const shapeMap = {
       maintain: "Maintain baseline tooth form without reshaping",
@@ -153,23 +181,40 @@ class PromptBuilder {
     }
   }
 
+  // UPDATED: Add gummy smile modification with severity levels
   addGummySmileModification() {
     const reduceGummy = this.params.reduce_gummy_smile === "true";
+    const severity = (this.params.gummy_smile_severity || "mild").toLowerCase();
 
     if (reduceGummy) {
+      const severityMap = {
+        mild: "Reduce visible gum tissue by 2-3mm",
+        moderate: "Reduce visible gum tissue by 4-5mm",
+        severe: "Reduce visible gum tissue by 6mm or more"
+      };
+
+      const liftAmount = severityMap[severity] || severityMap.mild;
       this.modifications.push(
-        "Reduce visible gum tissue by 2-4mm to achieve ideal 1-3mm gum display when smiling"
+        `${liftAmount} to achieve ideal 1-3mm gum display when smiling. IMPORTANT: Preserve all tooth shapes and facial aspects while adjusting gums only.`
       );
     }
   }
 
-  addIncisorShapeModification() {
-    const improveShape = this.params.improve_shape_of_incisal_edges === "true";
+  // UPDATED: Add incisor shape modification with mode
+  addIncisorShapeModification(preservationMode) {
+    const improveShape = this.params.improve_incisor_shape === "true";
+    const mode = (this.params.incisor_improvement_mode || "contouring").toLowerCase();
 
     if (improveShape) {
-      this.modifications.push(
-        "Refine incisal edges to create smooth, slightly rounded contours typical of youthful teeth"
-      );
+      if (mode === "contouring") {
+        this.modifications.push(
+          "ONLY perform edge contouring on incisors: smooth and refine incisal edges to create natural contours. DO NOT reshape the overall tooth form."
+        );
+      } else if (mode === "reshape") {
+        this.modifications.push(
+          "Redesign incisor shapes completely: create optimal proportions and contours while maintaining natural aesthetics"
+        );
+      }
     }
   }
 
@@ -199,6 +244,19 @@ class PromptBuilder {
     }
   }
 
+  // NEW: Add preservation constraints based on mode
+  addPreservationConstraints(preservationMode) {
+    if (preservationMode === "complete") {
+      this.modifications.push(
+        "CRITICAL CONSTRAINT: DO NOT modify any tooth shapes, facial aspects, or contours. Only perform gum modifications if specified. Preserve all existing tooth characteristics."
+      );
+    } else if (preservationMode === "edges_only") {
+      this.modifications.push(
+        "CRITICAL CONSTRAINT: ONLY perform edge contouring. Maintain all facial aspects and overall tooth shapes. Do not reshape or alter the facial surfaces of teeth."
+      );
+    }
+  }
+
   /**
    * Construct enhanced prompt with strict constraints
    */
@@ -214,11 +272,10 @@ STRICT MODIFICATION ZONE:
 - ${arch === "upper" ? "DO NOT modify the lower arch in any way" : ""}
 - ${arch === "lower" ? "DO NOT modify the upper arch in any way" : ""}
 - ${arch === "both" ? "Modify both upper and lower arches as specified" : ""}
-- Number of teeth to modify: ${teethCount} ${
-      teethCount === "full arch"
+- Number of teeth to modify: ${teethCount} ${teethCount === "full arch"
         ? ""
         : `(counting from the central midline outward)`
-    }
+      }
 - Leave all other teeth completely unchanged
 
 `;
@@ -238,15 +295,14 @@ STRICT MODIFICATION ZONE:
 - Maintain photorealistic quality with natural lighting and texture
 - Preserve original tooth anatomy and proportions within normal variation
 - Ensure modifications are clinically achievable with modern dentistry
-- Keep gum tissue, lips, and facial features completely unchanged
+- Keep gum tissue, lips, and facial features completely unchanged unless specified for gum work
 - Blend all edits seamlessly with no visible artifacts or discontinuities
 - Result must look like a professional before/after from an actual dental practice
 
 VERIFICATION CHECKLIST:
 ✓ Modified ONLY the ${archText} as specified
-✓ Left the ${
-      arch === "upper" ? "lower" : arch === "lower" ? "upper" : "non-target"
-    } teeth unmodified
+✓ Left the ${arch === "upper" ? "lower" : arch === "lower" ? "upper" : "non-target"
+      } teeth unmodified
 ✓ Applied all ${this.modifications.length} modifications correctly
 ✓ Maintained natural dental aesthetics throughout
 ✓ Result appears professionally achievable
@@ -258,10 +314,12 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
 
   /**
    * Validate if query parameters are valid
+   * UPDATED: Added validation for new parameters
    */
   static validate(queryParams) {
     const errors = [];
 
+    // Existing validation for arch
     if (queryParams.arch) {
       const validArchs = ["upper", "lower", "both"];
       if (!validArchs.includes(queryParams.arch.toLowerCase())) {
@@ -269,6 +327,7 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
       }
     }
 
+    // Existing validation for teeth_count
     if (queryParams.teeth_count || queryParams.number_of_teeth) {
       const count = queryParams.teeth_count || queryParams.number_of_teeth;
       if (count !== "full" && count !== "full_arch") {
@@ -279,6 +338,7 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
       }
     }
 
+    // Existing validation for brighten
     if (queryParams.brighten) {
       const validLevels = ["subtle", "natural", "super_natural"];
       if (!validLevels.includes(queryParams.brighten.toLowerCase())) {
@@ -288,6 +348,7 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
       }
     }
 
+    // Existing validation for tooth_shape
     if (queryParams.tooth_shape) {
       const validShapes = ["maintain", "square", "oval", "squoval"];
       if (!validShapes.includes(queryParams.tooth_shape.toLowerCase())) {
@@ -297,6 +358,37 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
       }
     }
 
+    // NEW: Validation for tooth_preservation_mode
+    if (queryParams.tooth_preservation_mode) {
+      const validModes = ["complete", "edges_only", "custom"];
+      if (!validModes.includes(queryParams.tooth_preservation_mode.toLowerCase())) {
+        errors.push(
+          "Invalid tooth_preservation_mode value. Must be: complete, edges_only, or custom"
+        );
+      }
+    }
+
+    // NEW: Validation for gummy_smile_severity
+    if (queryParams.gummy_smile_severity) {
+      const validSeverities = ["mild", "moderate", "severe"];
+      if (!validSeverities.includes(queryParams.gummy_smile_severity.toLowerCase())) {
+        errors.push(
+          "Invalid gummy_smile_severity value. Must be: mild, moderate, or severe"
+        );
+      }
+    }
+
+    // NEW: Validation for incisor_improvement_mode
+    if (queryParams.incisor_improvement_mode) {
+      const validModes = ["contouring", "reshape"];
+      if (!validModes.includes(queryParams.incisor_improvement_mode.toLowerCase())) {
+        errors.push(
+          "Invalid incisor_improvement_mode value. Must be: contouring or reshape"
+        );
+      }
+    }
+
+    // Existing validation for crowding
     if (queryParams.correct_crowding_with_alignment) {
       const validLevels = ["mild", "moderate", "severe"];
       if (
@@ -310,17 +402,19 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
       }
     }
 
+    // Updated boolean parameters list with new ones
     const booleanParams = [
       "widen_upper_teeth",
       "widen_lower_teeth",
       "close_spaces_evenly",
       "replace_missing_teeth",
-      "reduce_gummy_smile",
-      "improve_shape_of_incisal_edges",
+      "reduce_gummy_smile", // Now used with severity
+      "improve_incisor_shape", // NEW: Changed from improve_shape_of_incisal_edges
       "improve_gum_recession",
       "correct_underbite",
       "correct_overbite",
       "add_characterisation",
+      // Note: preserve_facial_aspect is handled differently in frontend
     ];
 
     booleanParams.forEach((param) => {
@@ -331,6 +425,14 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
         }
       }
     });
+
+    // Backward compatibility: Also check old parameter name
+    if (queryParams.improve_shape_of_incisal_edges !== undefined) {
+      const value = queryParams.improve_shape_of_incisal_edges.toLowerCase();
+      if (value !== "true" && value !== "false") {
+        errors.push("Invalid improve_shape_of_incisal_edges value. Must be: true or false");
+      }
+    }
 
     return {
       isValid: errors.length === 0,

@@ -72,10 +72,10 @@
                             <p class="text-gray-500 mb-4">
                                 or click to browse (JPEG, PNG, WebP - max 30MB)
                             </p>
-                            <button id="browse-btn" type="button" 
-                                   class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition cursor-pointer">
+                            <button id="browse-btn" type="button"
+                                class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition cursor-pointer">
                                 <i class="fas fa-folder-open mr-2"></i>Select Image
-                        </button>
+                            </button>
                             <button id="camera-btn"
                                 class="inline-block mt-3 px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition">
                                 <i class="fas fa-camera mr-2"></i> Take Picture
@@ -183,44 +183,45 @@
 
                     <!-- Color & Brightness -->
                     <div class="mb-8">
-                      <h3 class="font-medium text-gray-700 mb-4 flex items-center">
-                          <i class="fas fa-palette text-yellow-500 mr-2"></i>
-                          Color & Brightness
-                      </h3>
-                      <div>
-                          <label class="block text-sm font-medium text-gray-600 mb-2">
-                              Teeth Brightening
-                          </label>
-                          <div class="flex space-x-2">
-                              <button data-option="brighten" data-value="subtle"
-                                  class="option-card flex-1 p-4 border rounded-lg text-center hover:bg-gray-50">
-                                  <i class="fas fa-sun text-lg mb-2 text-yellow-400"></i>
-                                  <p class="font-medium">Subtle</p>
-                                  <p class="text-xs text-gray-500 mt-1">Natural White</p>
-                              </button>
-                              <button data-option="brighten" data-value="natural"
-                                  class="option-card flex-1 p-4 border rounded-lg text-center hover:bg-gray-50">
-                                  <i class="fas fa-sun text-lg mb-2 text-yellow-500"></i>
-                                  <p class="font-medium">Natural</p>
-                                  <p class="text-xs text-gray-500 mt-1">Healthy White</p>
-                              </button>
-                              <button data-option="brighten" data-value="super_natural"
-                                  class="option-card flex-1 p-4 border rounded-lg text-center hover:bg-gray-50">
-                                  <i class="fas fa-circle-notch text-lg mb-2 text-gray-600"></i>
-                                  <p class="font-medium">Super Natural</p>
-                                  <p class="text-xs text-gray-500 mt-1">Preserve current shade</p>
-                              </button>
-                          </div>
+                        <h3 class="font-medium text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-palette text-yellow-500 mr-2"></i>
+                            Color & Brightness
+                        </h3>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-2">
+                                Teeth Brightening
+                            </label>
+                            <div class="flex space-x-2">
+                                <button data-option="brighten" data-value="subtle"
+                                    class="option-card flex-1 p-4 border rounded-lg text-center hover:bg-gray-50">
+                                    <i class="fas fa-sun text-lg mb-2 text-yellow-400"></i>
+                                    <p class="font-medium">Subtle</p>
+                                    <p class="text-xs text-gray-500 mt-1">Natural White</p>
+                                </button>
+                                <button data-option="brighten" data-value="natural"
+                                    class="option-card flex-1 p-4 border rounded-lg text-center hover:bg-gray-50">
+                                    <i class="fas fa-sun text-lg mb-2 text-yellow-500"></i>
+                                    <p class="font-medium">Natural</p>
+                                    <p class="text-xs text-gray-500 mt-1">Healthy White</p>
+                                </button>
+                                <button data-option="brighten" data-value="super_natural"
+                                    class="option-card flex-1 p-4 border rounded-lg text-center hover:bg-gray-50">
+                                    <i class="fas fa-circle-notch text-lg mb-2 text-gray-600"></i>
+                                    <p class="font-medium">Super Natural</p>
+                                    <p class="text-xs text-gray-500 mt-1">Preserve current shade</p>
+                                </button>
+                            </div>
 
-                         <!-- Characterisation option -->
-                         <div class="mt-4">
-                           <label class="flex items-center space-x-2 cursor-pointer">
-                             <input type="checkbox" id="add_characterisation" class="rounded text-blue-600">
-                             <span class="text-gray-700">Add characterisation (reflections, opalescence, chroma)</span>
-                           </label>
-                         </div>
-                      </div>
-                  </div>
+                            <!-- Characterisation option -->
+                            <div class="mt-4">
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" id="add_characterisation" class="rounded text-blue-600">
+                                    <span class="text-gray-700">Add characterisation (reflections, opalescence,
+                                        chroma)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Structure & Alignment -->
                     <div class="mb-8">
@@ -271,40 +272,163 @@
                         </div>
                     </div>
 
-                    <!-- Tooth Shape -->
-                    <div class="mb-8">
+                    <div class="mb-8 p-4 border border-green-200 rounded-lg bg-green-50">
                         <h3 class="font-medium text-gray-700 mb-4 flex items-center">
-                            <i class="fas fa-tooth text-indigo-500 mr-2"></i>
-                            Baseline Tooth Form
+                            <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                            Tooth Shape Preservation
                         </h3>
-                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                            <button data-option="tooth_shape" data-value="maintain"
-                                class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
-                                <p class="font-medium">Maintain</p>
-                            </button>
-                            <button data-option="tooth_shape" data-value="square"
-                                class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
-                                <p class="font-medium">Square</p>
-                                <p class="text-xs text-gray-500">Masculine</p>
-                            </button>
-                            <button data-option="tooth_shape" data-value="oval"
-                                class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
-                                <p class="font-medium">Oval</p>
-                                <p class="text-xs text-gray-500">Feminine</p>
-                            </button>
-                            <button data-option="tooth_shape" data-value="squoval"
-                                class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
-                                <p class="font-medium">Squoval</p>
-                            </button>
+
+                        <div class="mb-4">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="maintain_all_tooth_shapes" class="rounded text-green-600"
+                                    checked>
+                                <span class="text-gray-700 font-medium">Maintain All Tooth Shapes</span>
+                            </label>
+                            <p class="text-sm text-gray-600 ml-6 mt-1">
+                                When checked, all existing tooth shapes and facial aspects will be preserved.
+                                Only gums and edges will be modified as selected below.
+                            </p>
+                        </div>
+
+                        <div class="ml-6 space-y-4">
+                            <div class="p-3 bg-white border rounded-lg">
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="tooth_preservation" value="complete"
+                                        class="text-green-600" checked>
+                                    <span class="text-gray-700">Complete Preservation</span>
+                                </label>
+                                <p class="text-xs text-gray-500 ml-6">No changes to tooth shapes, only gum work</p>
+                            </div>
+
+                            <div class="p-3 bg-white border rounded-lg">
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="tooth_preservation" value="edges_only"
+                                        class="text-green-600">
+                                    <span class="text-gray-700">Edge Contouring Only</span>
+                                </label>
+                                <p class="text-xs text-gray-500 ml-6">Maintain shapes, smooth rough edges only</p>
+                            </div>
+
+                            <div class="p-3 bg-white border rounded-lg">
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="tooth_preservation" value="custom" class="text-green-600">
+                                    <span class="text-gray-700">Custom Tooth Reshape</span>
+                                </label>
+                                <p class="text-xs text-gray-500 ml-6">Select specific tooth shape changes below</p>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Baseline Tooth Form - WRAP THIS SECTION -->
+                    <div id="tooth_shape_custom" style="display: block;"> <!-- This should start hidden -->
+                        <div class="mb-8">
+                            <h3 class="font-medium text-gray-700 mb-4 flex items-center">
+                                <i class="fas fa-tooth text-indigo-500 mr-2"></i>
+                                Baseline Tooth Form
+                            </h3>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                <button data-option="tooth_shape" data-value="maintain"
+                                    class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
+                                    <p class="font-medium">Maintain</p>
+                                </button>
+                                <button data-option="tooth_shape" data-value="square"
+                                    class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
+                                    <p class="font-medium">Square</p>
+                                    <p class="text-xs text-gray-500">Masculine</p>
+                                </button>
+                                <button data-option="tooth_shape" data-value="oval"
+                                    class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
+                                    <p class="font-medium">Oval</p>
+                                    <p class="text-xs text-gray-500">Feminine</p>
+                                </button>
+                                <button data-option="tooth_shape" data-value="squoval"
+                                    class="option-card p-3 border rounded-lg text-center hover:bg-gray-50">
+                                    <p class="font-medium">Squoval</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- Advanced Options -->
-                    <div>
+                    <div class="space-y-6">
                         <h3 class="font-medium text-gray-700 mb-4 flex items-center">
                             <i class="fas fa-cogs text-purple-500 mr-2"></i>
-                            Advanced Options
+                            Advanced Treatment Options
                         </h3>
+
+                        <!-- Gummy Smile Reduction with severity options - Alternative horizontal layout -->
+                        <div class="mb-6 p-4 border rounded-lg bg-gray-50">
+                            <label class="flex items-center space-x-2 cursor-pointer mb-3">
+                                <input type="checkbox" id="reduce_gummy_smile" class="rounded text-blue-600">
+                                <span class="text-gray-700 font-medium">Gummy Smile Reduction</span>
+                            </label>
+
+                            <div class="ml-0 sm:ml-6 space-y-3" id="gummy_smile_options" style="display: none;">
+                                <p class="text-sm text-gray-600 mb-2 sm:mb-0">Select gum lift severity (tooth shapes
+                                    will be preserved):</p>
+                                <div class="flex flex-col sm:grid sm:grid-cols-3 gap-2">
+                                    <button data-option="gummy_smile_severity" data-value="mild"
+                                        class="option-card p-3 border rounded-lg text-center hover:bg-gray-50 flex flex-col items-center justify-center">
+                                        <p class="font-medium text-sm sm:text-base">Mild</p>
+                                        <p class="text-xs text-gray-500 mt-1">2-3mm gum lift</p>
+                                        <p class="text-xs text-green-500 mt-1">✓ Teeth preserved</p>
+                                    </button>
+                                    <button data-option="gummy_smile_severity" data-value="moderate"
+                                        class="option-card p-3 border rounded-lg text-center hover:bg-gray-50 flex flex-col items-center justify-center">
+                                        <p class="font-medium text-sm sm:text-base">Moderate</p>
+                                        <p class="text-xs text-gray-500 mt-1">4-5mm gum lift</p>
+                                        <p class="text-xs text-green-500 mt-1">✓ Teeth preserved</p>
+                                    </button>
+                                    <button data-option="gummy_smile_severity" data-value="severe"
+                                        class="option-card p-3 border rounded-lg text-center hover:bg-gray-50 flex flex-col items-center justify-center">
+                                        <p class="font-medium text-sm sm:text-base">Severe</p>
+                                        <p class="text-xs text-gray-500 mt-1">6+mm gum lift</p>
+                                        <p class="text-xs text-green-500 mt-1">✓ Teeth preserved</p>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Incisor Shape Improvement -->
+                        <div class="mb-6 p-4 border rounded-lg bg-gray-50">
+                            <label class="flex items-center space-x-2 cursor-pointer mb-3">
+                                <input type="checkbox" id="improve_incisor_shape" class="rounded text-blue-600">
+                                <span class="text-gray-700 font-medium">Incisor Edge Improvement</span>
+                            </label>
+
+                            <div class="ml-0 sm:ml-6 space-y-3" id="incisor_options" style="display: none;">
+                                <div class="flex flex-col sm:grid sm:grid-cols-2 gap-3">
+                                    <div class="p-3 border border-blue-200 rounded-lg bg-blue-50">
+                                        <label class="flex items-start space-x-2 cursor-pointer">
+                                            <input type="radio" name="incisor_method" value="contouring"
+                                                class="text-blue-600 mt-1 flex-shrink-0" checked>
+                                            <div class="flex-1">
+                                                <span class="font-medium block">Edge Contouring Only</span>
+                                                <p class="text-xs text-gray-600 mt-1">
+                                                    Maintain current tooth shapes, only smooth and shape edges
+                                                </p>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="p-3 border rounded-lg bg-white">
+                                        <label class="flex items-start space-x-2 cursor-pointer">
+                                            <input type="radio" name="incisor_method" value="reshape"
+                                                class="text-blue-600 mt-1 flex-shrink-0">
+                                            <div class="flex-1">
+                                                <span class="font-medium block">Full Reshape</span>
+                                                <p class="text-xs text-gray-600 mt-1">
+                                                    Redesign incisor shapes completely
+                                                </p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other Dental Corrections -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-3">
                                 <label class="flex items-center space-x-2 cursor-pointer">
@@ -312,20 +436,11 @@
                                     <span class="text-gray-700">Replace Missing Teeth</span>
                                 </label>
                                 <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="checkbox" id="reduce_gummy_smile" class="rounded text-blue-600">
-                                    <span class="text-gray-700">Reduce Gummy Smile</span>
-                                </label>
-                                <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="checkbox" id="improve_shape_of_incisal_edges"
-                                        class="rounded text-blue-600">
-                                    <span class="text-gray-700">Improve Incisor Shape</span>
-                                </label>
-                            </div>
-                            <div class="space-y-3">
-                                <label class="flex items-center space-x-2 cursor-pointer">
                                     <input type="checkbox" id="improve_gum_recession" class="rounded text-blue-600">
                                     <span class="text-gray-700">Improve Gum Recession</span>
                                 </label>
+                            </div>
+                            <div class="space-y-3">
                                 <label class="flex items-center space-x-2 cursor-pointer">
                                     <input type="checkbox" id="correct_underbite" class="rounded text-blue-600">
                                     <span class="text-gray-700">Correct Underbite</span>
@@ -529,52 +644,46 @@
         </div>
     </footer>
     <!-- Camera Modal -->
-<div id="camera-modal"
-     class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
-  <div class="bg-white rounded-xl p-6 w-full max-w-md relative">
-    
-    <h3 class="text-lg font-bold mb-4 flex items-center">
-      <i class="fas fa-camera mr-2"></i> Capture Image
-    </h3>
-    <!-- Camera Overlay -->
-     <div class="absolute inset-0 bg-black bg-opacity-30 rounded-xl pointer-events-none"></div>
-<div class="absolute inset-0 pointer-events-none flex items-center justify-center">
-  <div class="relative w-64 h-36 border-2 border-white rounded-xl">
-    <i class="fas fa-tooth absolute inset-0 flex items-center justify-center text-white text-3xl opacity-80"></i>
-    <p class="absolute -bottom-7 w-full text-center text-white text-xs">
-      Open mouth & show teeth clearly
-    </p>
-  </div>
-</div>
+    <div id="camera-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md relative">
 
-    <video id="camera-video"
-           autoplay
-           playsinline
-           class="w-full rounded-lg bg-black mb-4"></video>
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <i class="fas fa-camera mr-2"></i> Capture Image
+            </h3>
+            <!-- Camera Overlay -->
+            <div class="absolute inset-0 bg-black bg-opacity-30 rounded-xl pointer-events-none"></div>
+            <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div class="relative w-64 h-36 border-2 border-white rounded-xl">
+                    <i
+                        class="fas fa-tooth absolute inset-0 flex items-center justify-center text-white text-3xl opacity-80"></i>
+                    <p class="absolute -bottom-7 w-full text-center text-white text-xs">
+                        Open mouth & show teeth clearly
+                    </p>
+                </div>
+            </div>
 
-    <canvas id="camera-canvas" class="hidden"></canvas>
+            <video id="camera-video" autoplay playsinline class="w-full rounded-lg bg-black mb-4"></video>
 
-   <div class="flex justify-between items-center mt-3">
-  <button id="switch-camera"
-    class="px-3 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm">
-    <i class="fas fa-sync-alt mr-1"></i> Switch
-  </button>
+            <canvas id="camera-canvas" class="hidden"></canvas>
 
-  <button id="capture-btn"
-    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-    <i class="fas fa-camera mr-1"></i> Capture
-  </button>
+            <div class="flex justify-between items-center mt-3">
+                <button id="switch-camera" class="px-3 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm">
+                    <i class="fas fa-sync-alt mr-1"></i> Switch
+                </button>
 
-  <button id="close-camera"
-    class="px-3 py-2 bg-red-100 rounded-lg hover:bg-red-200 text-sm">
-    Cancel
-  </button>
-</div>
+                <button id="capture-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-camera mr-1"></i> Capture
+                </button>
 
-  </div>
-</div>
+                <button id="close-camera" class="px-3 py-2 bg-red-100 rounded-lg hover:bg-red-200 text-sm">
+                    Cancel
+                </button>
+            </div>
 
-<audio id="camera-sound" src="./sounds/shutter.mp3" preload="auto"></audio>
+        </div>
+    </div>
+
+    <audio id="camera-sound" src="./sounds/shutter.mp3" preload="auto"></audio>
     <script src="./script.js"></script>
 
 </body>

@@ -27,7 +27,13 @@ class ImageController {
       // 2. Validate query parameters
       // console.log("file got", req.file);
 
-      const validation = PromptBuilder.validate(req.query);
+      let params;
+      if (Object.keys(req.body).length !== 0) params = req.body;
+      if (Object.keys(req.query).length !== 0) params = req.query;
+      
+      console.log("request data : ",params)
+      
+      const validation = PromptBuilder.validate(params);
       if (!validation.isValid) {
         return res.status(400).json({
           success: false,
@@ -36,9 +42,6 @@ class ImageController {
         });
       }
 
-      let params;
-      if (Object.keys(req.body).length !== 0) params = req.body;
-      if (Object.keys(req.query).length !== 0) params = req.query;
 
       const promptBuilder = new PromptBuilder(params);
       const prompt = promptBuilder.build();

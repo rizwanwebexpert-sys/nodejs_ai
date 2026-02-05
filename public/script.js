@@ -1,6 +1,6 @@
 const API_URL = "https://nodejs-ai-3591.vercel.app/"; // Change this to your backend URL
 
-// State
+// State - UPDATED with new options
 let state = {
   imageFile: null,
   selectedOptions: {
@@ -8,23 +8,26 @@ let state = {
     teeth_count: "6",
     brighten: null,
     correct_crowding_with_alignment: null,
-    tooth_shape: "maintain",
+    tooth_shape: "maintain_existing",
+    tooth_preservation_mode: "complete", // NEW: complete, edges_only, custom
+    gummy_smile_severity: null, // NEW: mild, moderate, severe
+    incisor_improvement_mode: "contouring", // NEW: contouring, reshape
     widen_upper_teeth: false,
     widen_lower_teeth: false,
     close_spaces_evenly: false,
     replace_missing_teeth: false,
     reduce_gummy_smile: false,
-    improve_shape_of_incisal_edges: false,
+    improve_incisor_shape: false, // CHANGED: from improve_shape_of_incisal_edges
     improve_gum_recession: false,
     correct_underbite: false,
     correct_overbite: false,
     add_characterisation: false,
+    preserve_facial_aspect: true, // NEW
   },
   results: null,
 };
 
-
-// DOM Elements
+// DOM Elements - UPDATED with new elements
 const elements = {
   uploadArea: document.getElementById("upload-area"),
   uploadButton: document.getElementById("browse-btn"),
@@ -60,19 +63,25 @@ const elements = {
   closeCamera: document.getElementById("close-camera"),
   switchCameraBtn: document.getElementById("switch-camera"),
   cameraSound: document.getElementById("camera-sound"),
-
-
+  
+  // NEW ELEMENTS
+  maintainAllToothShapes: document.getElementById("maintain_all_tooth_shapes"),
+  gummySmileOptions: document.getElementById("gummy_smile_options"),
+  incisorOptions: document.getElementById("incisor_options"),
+  toothShapeCustom: document.getElementById("tooth_shape_custom"),
+  preserveFacialAspect: document.getElementById("preserve_facial_aspect")
 };
+
 let cameraStream = null;
 let soundUnlocked = false;
 let currentFacingMode = "user"; // user | environment
-
 
 // Initialize
 document.addEventListener("DOMContentLoaded", function () {
   checkHealthStatus();
   setupEventListeners();
   updateGenerateButton();
+  updateOptionsSummary(); // Initialize summary
 });
 
 // Check server health
@@ -85,27 +94,27 @@ async function checkHealthStatus() {
       elements.healthStatus.className =
         "mb-8 p-4 bg-green-50 border border-green-200 rounded-lg";
       elements.healthStatus.innerHTML = `
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle text-green-500 text-lg mr-3"></i>
-                            <div>
-                                <h3 class="font-medium text-green-800">System Ready</h3>
-                                <p class="text-sm text-green-600">
-                                    Connected to server • OpenAI: ${data.openaiConfigured? "Available": "Not Configured"}
-                                </p>
-                            </div>
-                        </div>`;
+        <div class="flex items-center">
+          <i class="fas fa-check-circle text-green-500 text-lg mr-3"></i>
+          <div>
+            <h3 class="font-medium text-green-800">System Ready</h3>
+            <p class="text-sm text-green-600">
+              Connected to server • OpenAI: ${data.openaiConfigured? "Available": "Not Configured"}
+            </p>
+          </div>
+        </div>`;
     }
   } catch (error) {
     elements.healthStatus.className ="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg";
     elements.healthStatus.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-lg mr-3"></i>
-                        <div>
-                            <h3 class="font-medium text-red-800">Server Connection Failed</h3>
-                            <p class="text-sm text-red-600">Please ensure the backend server is running on ${API_URL}</p>
-                        </div>
-                    </div>
-                `;
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-triangle text-red-500 text-lg mr-3"></i>
+        <div>
+          <h3 class="font-medium text-red-800">Server Connection Failed</h3>
+          <p class="text-sm text-red-600">Please ensure the backend server is running on ${API_URL}</p>
+        </div>
+      </div>
+    `;
   } finally {
     elements.healthStatus.classList.remove("hidden");
   }
@@ -118,9 +127,9 @@ function setupEventListeners() {
     elements.imageInput.click()
   );
   elements.uploadButton.addEventListener("click", (e) => {
-  e.stopPropagation();
-  elements.imageInput.click();
-});
+    e.stopPropagation();
+    elements.imageInput.click();
+  });
   elements.imageInput.addEventListener("change", handleImageSelect);
   elements.removeImage.addEventListener("click", removeImage);
 
@@ -142,20 +151,65 @@ function setupEventListeners() {
     }
   });
 
-  // Option buttons
+  // Option buttons (including new ones)
   document.querySelectorAll("[data-option]").forEach((button) => {
     button.addEventListener("click", () => {
       const option = button.dataset.option;
       const value = button.dataset.value;
 
-      // Handle boolean-like options (arch, teeth_count, brighten, crowding, tooth shape)
+      // Handle tooth shape options
+      if (option === "tooth_shape") {
+        // Deselect all siblings in the same group
+        button.parentElement
+          .querySelectorAll(".option-card")
+          .forEach((card) => {
+            card.classList.remove("selected");
+          });
+        // Select clicked button
+        button.classList.add("selected");
+        state.selectedOptions[option] = value;
+        
+        // If custom tooth shape is selected, update tooth_preservation_mode
+        if (option === "tooth_shape") {
+          state.selectedOptions.tooth_preservation_mode = "custom";
+          // Also update the radio button
+          document.querySelector('input[name="tooth_preservation"][value="custom"]').checked = true;
+        }
+      }
+      
+      // Handle gummy smile severity options
+      if (option === "gummy_smile_severity") {
+        // Deselect all siblings in the same group
+        button.parentElement
+          .querySelectorAll(".option-card")
+          .forEach((card) => {
+            card.classList.remove("selected");
+          });
+        // Select clicked button
+        button.classList.add("selected");
+        state.selectedOptions[option] = value;
+      }
+      
+      // Handle incisor method options
+      if (option === "incisor_method") {
+        // Deselect all siblings in the same group
+        button.parentElement
+          .querySelectorAll(".option-card")
+          .forEach((card) => {
+            card.classList.remove("bg-blue-50", "border-blue-300", "text-blue-700");
+          });
+        // Select clicked button
+        button.classList.add("bg-blue-50", "border-blue-300", "text-blue-700");
+        state.selectedOptions.incisor_improvement_mode = value;
+      }
+
+      // Handle original options
       if (
         [
           "arch",
           "teeth_count",
           "brighten",
           "correct_crowding_with_alignment",
-          "tooth_shape",
         ].includes(option)
       ) {
         // Deselect all siblings
@@ -174,47 +228,152 @@ function setupEventListeners() {
     });
   });
 
-  // Checkboxes
+  // NEW: Tooth preservation radio buttons
+  document.querySelectorAll('input[name="tooth_preservation"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      state.selectedOptions.tooth_preservation_mode = e.target.value;
+      
+      // Show/hide custom tooth shape options
+      if (e.target.value === "custom") {
+        elements.toothShapeCustom.style.display = "block";
+        // Select first custom tooth shape option by default
+        const firstCustomOption = elements.toothShapeCustom.querySelector(".option-card");
+        if (firstCustomOption) {
+          firstCustomOption.click();
+        }
+      } else {
+        elements.toothShapeCustom.style.display = "none";
+        // Set tooth_shape to maintain_existing if not custom
+        state.selectedOptions.tooth_shape = "maintain_existing";
+        document.querySelector('[data-option="tooth_shape"][data-value="maintain_existing"]')?.classList.add("selected");
+      }
+      
+      updateOptionsSummary();
+    });
+  });
+
+  // NEW: Maintain All Tooth Shapes checkbox
+  if (elements.maintainAllToothShapes) {
+    elements.maintainAllToothShapes.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        // Force complete preservation mode
+        document.querySelector('input[name="tooth_preservation"][value="complete"]').checked = true;
+        state.selectedOptions.tooth_preservation_mode = "complete";
+        elements.toothShapeCustom.style.display = "none";
+        
+        // Update all gummy smile options to show preservation
+        document.querySelectorAll('[data-option="gummy_smile_severity"]').forEach(opt => {
+          const statusText = opt.querySelector(".text-green-500");
+          if (statusText) {
+            statusText.textContent = "✓ Teeth preserved";
+          }
+        });
+      }
+      updateOptionsSummary();
+    });
+  }
+
+  // Checkboxes (updated with new IDs)
   document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
     checkbox.addEventListener("change", (e) => {
-      state.selectedOptions[e.target.id] = e.target.checked;
+      const id = e.target.id;
+      state.selectedOptions[id] = e.target.checked;
+      
+      // Handle special cases for new checkboxes
+      if (id === "reduce_gummy_smile") {
+        if (e.target.checked) {
+          elements.gummySmileOptions.style.display = "block";
+          // Select first severity option by default
+          const firstSeverityOption = elements.gummySmileOptions.querySelector(".option-card");
+          if (firstSeverityOption) {
+            firstSeverityOption.click();
+          }
+        } else {
+          elements.gummySmileOptions.style.display = "none";
+          state.selectedOptions.gummy_smile_severity = null;
+        }
+      }
+      
+      if (id === "improve_incisor_shape") {
+        if (e.target.checked) {
+          elements.incisorOptions.style.display = "block";
+        } else {
+          elements.incisorOptions.style.display = "none";
+        }
+      }
+      
+      if (id === "preserve_facial_aspect") {
+        if (e.target.checked) {
+          // Automatically check "Maintain All Tooth Shapes" when preserving facial aspect
+          if (elements.maintainAllToothShapes) {
+            elements.maintainAllToothShapes.checked = true;
+            elements.maintainAllToothShapes.dispatchEvent(new Event("change"));
+          }
+        }
+      }
+
       updateOptionsSummary();
       updateGenerateButton();
+    });
+  });
+
+  // NEW: Incisor method radio buttons
+  document.querySelectorAll('input[name="incisor_method"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      state.selectedOptions.incisor_improvement_mode = e.target.value;
+      updateOptionsSummary();
     });
   });
 
   // Generate button
   elements.generateBtn.addEventListener("click", generateImage);
 
-  // Modal
-  // elements.viewPromptBtn.addEventListener("click", showPromptModal);
-  // elements.closeModal.addEventListener("click", () => {
-  //   elements.promptModal.classList.add("hidden");
-  // });
-  // elements.copyPrompt.addEventListener("click", copyPromptToClipboard);
-
   // Reset
   elements.resetBtn.addEventListener("click", resetAll);
 
-  // Close modal on outside click
-  // elements.promptModal.addEventListener("click", (e) => {
-  //   if (e.target === elements.promptModal) {
-  //     elements.promptModal.classList.add("hidden");
-  //   }
-  // });
-
   // Download button
   elements.downloadBtn.addEventListener("click", downloadResult);
+  
+  // Camera functionality
   elements.cameraBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    openCamera()
-  }
-  );
+    openCamera();
+  });
+  
   elements.captureBtn.addEventListener("click", capturePhoto);
   elements.closeCamera.addEventListener("click", closeCamera);
   elements.switchCameraBtn.addEventListener("click", switchCamera);
 
+  // Initialize new sections
+  initializeNewSections();
+}
 
+// Initialize new sections
+function initializeNewSections() {
+  // Set default states for new sections
+  if (elements.maintainAllToothShapes) {
+    elements.maintainAllToothShapes.checked = true;
+  }
+  
+  if (elements.preserveFacialAspect) {
+    elements.preserveFacialAspect.checked = true;
+  }
+  
+  // Set default tooth preservation mode
+  document.querySelector('input[name="tooth_preservation"][value="complete"]').checked = true;
+  
+  // Hide advanced options by default
+  if (elements.gummySmileOptions) {
+    elements.gummySmileOptions.style.display = "none";
+  }
+  
+  if (elements.incisorOptions) {
+    elements.incisorOptions.style.display = "none";
+  }
+  
+  if (elements.toothShapeCustom) {
+    elements.toothShapeCustom.style.display = "none";
+  }
 }
 
 // Handle image selection
@@ -237,9 +396,7 @@ function handleImageSelect(event) {
 
   reader.onload = function (e) {
     elements.previewImg.src = e.target.result;
-    elements.imageSize.textContent = `${(file.size / (1024 * 1024)).toFixed(
-      2
-    )} MB`;
+    elements.imageSize.textContent = `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
     elements.imagePreview.classList.remove("hidden");
     updateGenerateButton();
   };
@@ -261,43 +418,54 @@ function updateGenerateButton() {
   elements.generateBtn.disabled = !hasImage;
 }
 
-// Update options summary
+// Update options summary - UPDATED for new options
 function updateOptionsSummary() {
   const summary = [];
   const options = state.selectedOptions;
 
+  // Basic options
   if (options.arch) {
     summary.push(`<span class="text-blue-600">Arch:</span> ${options.arch}`);
   }
   if (options.teeth_count) {
-    summary.push(
-      `<span class="text-blue-600">Teeth:</span> ${options.teeth_count}`
-    );
+    summary.push(`<span class="text-blue-600">Teeth:</span> ${options.teeth_count}`);
   }
   if (options.brighten) {
-    summary.push(
-      `<span class="text-blue-600">Brighten:</span> ${options.brighten}`
-    );
+    summary.push(`<span class="text-blue-600">Brighten:</span> ${options.brighten}`);
   }
-  if (options.tooth_shape) {
-    summary.push(
-      `<span class="text-blue-600">Shape:</span> ${options.tooth_shape}`
-    );
+  
+  // Tooth shape information based on preservation mode
+  if (options.tooth_preservation_mode === "complete") {
+    summary.push(`<span class="text-green-600">Tooth Preservation:</span> Complete (shapes maintained)`);
+  } else if (options.tooth_preservation_mode === "edges_only") {
+    summary.push(`<span class="text-green-600">Tooth Preservation:</span> Edge Contouring Only`);
+  } else if (options.tooth_preservation_mode === "custom" && options.tooth_shape) {
+    summary.push(`<span class="text-blue-600">Tooth Shape:</span> ${options.tooth_shape}`);
   }
+  
   if (options.correct_crowding_with_alignment) {
-    summary.push(
-      `<span class="text-blue-600">Crowding:</span> ${options.correct_crowding_with_alignment}`
-    );
+    summary.push(`<span class="text-blue-600">Crowding:</span> ${options.correct_crowding_with_alignment}`);
   }
 
-  // Boolean options
+  // Gummy smile with severity
+  if (options.reduce_gummy_smile && options.gummy_smile_severity) {
+    summary.push(`<span class="text-green-600">✓ Gummy Smile Reduction:</span> ${options.gummy_smile_severity} (teeth preserved)`);
+  } else if (options.reduce_gummy_smile) {
+    summary.push(`<span class="text-green-600">✓ Gummy Smile Reduction</span>`);
+  }
+
+  // Incisor improvement with mode
+  if (options.improve_incisor_shape) {
+    const modeText = options.incisor_improvement_mode === "contouring" ? "Edge Contouring Only" : "Full Reshape";
+    summary.push(`<span class="text-green-600">✓ Incisor Improvement:</span> ${modeText}`);
+  }
+
+  // Other boolean options
   const booleanOptions = [
     "widen_upper_teeth",
     "widen_lower_teeth",
     "close_spaces_evenly",
     "replace_missing_teeth",
-    "reduce_gummy_smile",
-    "improve_shape_of_incisal_edges",
     "improve_gum_recession",
     "correct_underbite",
     "correct_overbite",
@@ -311,9 +479,13 @@ function updateOptionsSummary() {
     }
   });
 
+  // Facial aspect preservation
+  if (options.preserve_facial_aspect) {
+    summary.push(`<span class="text-green-600">✓ Preserve Facial Aspect</span>`);
+  }
+
   if (summary.length === 0) {
-    elements.optionsSummary.innerHTML =
-      '<p class="text-sm text-gray-500 italic">No options selected yet</p>';
+    elements.optionsSummary.innerHTML = '<p class="text-sm text-gray-500 italic">No options selected yet</p>';
   } else {
     elements.optionsSummary.innerHTML = summary
       .map((item) => `<p class="text-sm text-gray-700">${item}</p>`)
@@ -321,7 +493,7 @@ function updateOptionsSummary() {
   }
 }
 
-// Generate image
+// Generate image - UPDATED to include new parameters
 async function generateImage() {
   if (!state.imageFile) return;
 
@@ -344,13 +516,20 @@ async function generateImage() {
   const formData = new FormData();
   formData.append("image", state.imageFile);
 
-  // Add query parameters
+  // Add query parameters - UPDATED with new options
   Object.keys(state.selectedOptions).forEach((key) => {
-    if (
-      state.selectedOptions[key] !== null &&
-      state.selectedOptions[key] !== false
-    ) {
-      formData.append(key, state.selectedOptions[key]);
+    const value = state.selectedOptions[key];
+    
+    // Only send non-null, non-false values
+    if (value !== null && value !== false && value !== undefined) {
+      // For checkboxes, only send if true
+      if (typeof value === "boolean") {
+        if (value === true) {
+          formData.append(key, "true");
+        }
+      } else {
+        formData.append(key, value);
+      }
     }
   });
 
@@ -377,11 +556,6 @@ async function generateImage() {
 
       // Update UI with results
       elements.resultImage.src = data.data.generatedImageUrl;
-      // elements.aiDescription.textContent = data.data.description;
-
-      // Set modal content
-      // elements.fullPrompt.textContent = data.data.prompt;
-      // elements.apiResponse.textContent = JSON.stringify(data.data, null, 2);
 
       // Show results
       setTimeout(() => {
@@ -414,27 +588,6 @@ function showError(message) {
   elements.processingIndicator.classList.add("hidden");
 }
 
-// Show prompt modal
-function showPromptModal() {
-  if (state.results) {
-    // elements.promptModal.classList.remove("hidden");
-  }
-}
-
-// Copy prompt to clipboard
-async function copyPromptToClipboard() {
-  try {
-    await navigator.clipboard.writeText(state.results.prompt);
-    const originalText = elements.copyPrompt.innerHTML;
-    elements.copyPrompt.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
-    setTimeout(() => {
-      elements.copyPrompt.innerHTML = originalText;
-    }, 2000);
-  } catch (error) {
-    console.error("Failed to copy:", error);
-  }
-}
-
 // Download result
 function downloadResult() {
   if (!state.results) return;
@@ -447,7 +600,7 @@ function downloadResult() {
   document.body.removeChild(link);
 }
 
-// Reset all
+// Reset all - UPDATED for new options
 function resetAll() {
   // Reset state
   state = {
@@ -457,17 +610,21 @@ function resetAll() {
       teeth_count: "6",
       brighten: null,
       correct_crowding_with_alignment: null,
-      tooth_shape: "maintain",
+      tooth_shape: "maintain_existing",
+      tooth_preservation_mode: "complete",
+      gummy_smile_severity: null,
+      incisor_improvement_mode: "contouring",
       widen_upper_teeth: false,
       widen_lower_teeth: false,
       close_spaces_evenly: false,
       replace_missing_teeth: false,
       reduce_gummy_smile: false,
-      improve_shape_of_incisal_edges: false,
+      improve_incisor_shape: false,
       improve_gum_recession: false,
       correct_underbite: false,
       correct_overbite: false,
       add_characterisation: false,
+      preserve_facial_aspect: true,
     },
     results: null,
   };
@@ -480,25 +637,45 @@ function resetAll() {
   elements.processingIndicator.classList.add("hidden");
 
   // Reset checkboxes
-  document
-    .querySelectorAll('input[type="checkbox"]')
-    .forEach((cb) => (cb.checked = false));
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+    if (cb.id === "maintain_all_tooth_shapes" || cb.id === "preserve_facial_aspect") {
+      cb.checked = true; // Keep these checked by default
+    } else {
+      cb.checked = false;
+    }
+  });
 
-  // Reset option buttons
+  // Reset radio buttons
+  document.querySelectorAll('input[type="radio"]').forEach((radio) => {
+    if (radio.name === "tooth_preservation" && radio.value === "complete") {
+      radio.checked = true;
+    } else if (radio.name === "incisor_method" && radio.value === "contouring") {
+      radio.checked = true;
+    } else {
+      radio.checked = false;
+    }
+  });
+
+  // Reset option cards
   document.querySelectorAll(".option-card").forEach((card) => {
-    card.classList.remove("selected");
+    card.classList.remove("selected", "bg-blue-50", "border-blue-300", "text-blue-700");
   });
 
   // Set defaults
-  document
-    .querySelector('[data-option="arch"][data-value="upper"]')
-    .classList.add("selected");
-  document
-    .querySelector('[data-option="teeth_count"][data-value="6"]')
-    .classList.add("selected");
-  document
-    .querySelector('[data-option="tooth_shape"][data-value="maintain"]')
-    .classList.add("selected");
+  document.querySelector('[data-option="arch"][data-value="upper"]')?.classList.add("selected");
+  document.querySelector('[data-option="teeth_count"][data-value="6"]')?.classList.add("selected");
+  document.querySelector('[data-option="tooth_shape"][data-value="maintain_existing"]')?.classList.add("selected");
+
+  // Hide advanced options sections
+  if (elements.gummySmileOptions) {
+    elements.gummySmileOptions.style.display = "none";
+  }
+  if (elements.incisorOptions) {
+    elements.incisorOptions.style.display = "none";
+  }
+  if (elements.toothShapeCustom) {
+    elements.toothShapeCustom.style.display = "none";
+  }
 
   updateOptionsSummary();
   updateGenerateButton();
@@ -510,8 +687,7 @@ function resetAll() {
 // Show temporary message
 function showTemporaryMessage(message) {
   const msg = document.createElement("div");
-  msg.className =
-    "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50";
+  msg.className = "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50";
   msg.textContent = message;
   document.body.appendChild(msg);
 
@@ -520,9 +696,7 @@ function showTemporaryMessage(message) {
   }, 3000);
 }
 
-
-
-
+// Camera functions
 async function openCamera() {
   closeCamera(); // ensure clean start
 
@@ -537,20 +711,20 @@ async function openCamera() {
     elements.cameraVideo.srcObject = cameraStream;
     elements.cameraModal.classList.remove("hidden");
   } catch (err) {
-    elements.healthStatus.innerHTML = ` <div class="flex items-center">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-lg mr-3"></i>
-                        <div>
-                            <h3 class="font-medium text-red-800">Failed to open Camera</h3>
-                            <p class="text-sm text-red-600">Camera not supported or permission denied</p>
-                        </div>
-                    </div>`
-    elements.healthStatus.className.remove("hidden")
+    elements.healthStatus.innerHTML = ` 
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-triangle text-red-500 text-lg mr-3"></i>
+        <div>
+          <h3 class="font-medium text-red-800">Failed to open Camera</h3>
+          <p class="text-sm text-red-600">Camera not supported or permission denied</p>
+        </div>
+      </div>`;
+    elements.healthStatus.classList.remove("hidden");
   }
 }
-async function switchCamera() {
-  currentFacingMode =
-    currentFacingMode === "user" ? "environment" : "user";
 
+async function switchCamera() {
+  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
   await openCamera();
 }
 
@@ -579,7 +753,6 @@ function capturePhoto() {
   }, 700);
 }
 
-
 function closeCamera() {
   if (cameraStream) {
     cameraStream.getTracks().forEach((track) => track.stop());
@@ -589,13 +762,13 @@ function closeCamera() {
   elements.cameraModal.classList.add("hidden");
 }
 
+// Audio unlock for camera sound
 let audioUnlocked = false;
-
 document.addEventListener("touchstart", () => {
   if (!audioUnlocked) {
-    shutterSound.play().then(() => {
-      shutterSound.pause();
-      shutterSound.currentTime = 0;
+    elements.cameraSound.play().then(() => {
+      elements.cameraSound.pause();
+      elements.cameraSound.currentTime = 0;
       audioUnlocked = true;
     });
   }

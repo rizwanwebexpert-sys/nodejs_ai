@@ -350,7 +350,7 @@ OUTPUT: Return the modified image maintaining original resolution and quality.`;
 
     // Existing validation for tooth_shape
     if (queryParams.tooth_shape) {
-      const validShapes = ["maintain", "square", "oval", "squoval"];
+      const validShapes = ["maintain_existing","maintain", "square", "oval", "squoval"];
       if (!validShapes.includes(queryParams.tooth_shape.toLowerCase())) {
         errors.push(
           "Invalid tooth_shape value. Must be: maintain, square, oval, or squoval"
